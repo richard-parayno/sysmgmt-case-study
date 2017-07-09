@@ -1,24 +1,37 @@
-db:
-  image: mariadb
-  ports:
-    - "8082:3306"
-  environment:
-    MYSQL_ROOT_PASSWORD: p@ssword
+version: '3'
 
-wp-main:
-  image: wordpress
-  volumes:
-    - ./:/var/www/html
-  ports:
-    - "8080:80"
-  links:
-    - db:mysql
-  environment:
-    WORDPRESS_DB_PASSWORD: p@ssword
+services: 
+  db:
+    image: mariadb
+    ports:
+      - "8082:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: p@ssword
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
 
-phpmyadmin:
-  image: phpmyadmin/phpmyadmin:latest
-  ports:
-    - "8081:80"
-  links:
-    - db:db
+  wp-main:
+    image: wordpress
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8080:80"
+    links:
+      - db:mysql
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - "8081:80"
+    links:
+      - db:db
+
+volumes:
+  db_data: 
